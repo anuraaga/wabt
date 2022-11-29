@@ -111,17 +111,8 @@ check_type_size(size_t SIZEOF_SIZE_T)
 include(TestBigEndian)  # Note: deprecated in CMake 3.20
 test_big_endian(WABT_BIG_ENDIAN)
 
-if(DEFINED ENV{WASM2C_CFLAGS})
-  set(WASM2C_CFLAGS "$ENV{WASM2C_CFLAGS}")
-endif ()
-  
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(WABT_DEBUG 1)
-  set(WASM2C_CFLAGS "${WASM2C_CFLAGS} -g -O0")
-endif ()
-
-if (DEFINED CMAKE_OSX_SYSROOT)
-  set(WASM2C_CFLAGS "${WASM2C_CFLAGS} -isysroot ${CMAKE_OSX_SYSROOT}")
 endif ()
 
 configure_file(src/config.h.in include/wabt/config.h @ONLY)
@@ -608,6 +599,18 @@ if (BUILD_TOOLS)
 endif ()
 
 if (BUILD_TESTS)
+  if(DEFINED ENV{WASM2C_CFLAGS})
+    set(WASM2C_CFLAGS "${WASM2C_CFLAGS} $ENV{WASM2C_CFLAGS}")
+  endif ()
+
+  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(WASM2C_CFLAGS "${WASM2C_CFLAGS} -g -O0")
+  endif ()
+
+  if (DEFINED CMAKE_OSX_SYSROOT)
+    set(WASM2C_CFLAGS "${WASM2C_CFLAGS} -isysroot ${CMAKE_OSX_SYSROOT}")
+  endif ()
+
   set(THREADS_PREFER_PTHREAD_FLAG ON)
   find_package(Threads REQUIRED)
 
