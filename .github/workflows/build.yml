@@ -83,16 +83,16 @@ jobs:
   wasi:
     name: wasi
     runs-on: ubuntu-latest
-    container: ghcr.io/webassembly/wasi-sdk:wasi-sdk-20
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
       - name: build-tools
         run: |
-          cmake -S . -B out -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=0
+          docker run -di --name wasi-sdk -v $(pwd):/src --workdir /src ghcr.io/webassembly/wasi-sdk:wasi-sdk-20 bash
+          docker exec wasi-sdk cmake -S . -B out -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=0
           # We only build tools, not runtime, for WASI build
-          cmake --build out --config Release \
+          docker exec wasi-sdk cmake --build out --config Release \
           --target wast2json-copy-to-bin \
           --target wasm-decompile-copy-to-bin \
           --target wasm-opcodecnt-copy-to-bin \
